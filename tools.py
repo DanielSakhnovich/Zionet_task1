@@ -2,40 +2,49 @@ import re
 
 TOOL_DEFINITIONS = [
     {
-        "name": "get_weather",
-        "description": "Get the current weather for a given city. Returns mocked weather data.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "city": {
-                    "type": "string",
-                    "description": "The name of the city to get weather for.",
-                }
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get the current weather for a given city. Returns mocked weather data.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "type": "string",
+                        "description": "The name of the city to get weather for.",
+                    }
+                },
+                "required": ["city"],
             },
-            "required": ["city"],
         },
     },
     {
-        "name": "calculator",
-        "description": "Evaluate a simple arithmetic expression and return the result.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "expr": {
-                    "type": "string",
-                    "description": "A arithmetic expression to evaluate, e.g. '15 * 7' or '(100 + 50) / 3'.",
-                }
+        "type": "function",
+        "function": {
+            "name": "calculator",
+            "description": "Evaluate a simple arithmetic expression and return the result.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "expr": {
+                        "type": "string",
+                        "description": "An arithmetic expression to evaluate, e.g. '15 * 7' or '(100 + 50) / 3'.",
+                    }
+                },
+                "required": ["expr"],
             },
-            "required": ["expr"],
         },
     },
     {
-        "name": "get_current_time",
-        "description": "Get the current date and time.",
-        "input_schema": {
-            "type": "object",
-            "properties": {},
-            "required": [],
+        "type": "function",
+        "function": {
+            "name": "get_current_time",
+            "description": "Get the current date and time.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
         },
     },
 ]

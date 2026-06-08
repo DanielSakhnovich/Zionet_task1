@@ -1,7 +1,7 @@
 import json
 from agent import run
 
-USER_PROMPT = "What is the weather in Tokyo? Also, what is 128 * 3? And what time is it right now?"
+USER_PROMPT = "What is the weather today in Beer-Sheva? Also, what is the result of 18*18?"
 
 if __name__ == "__main__":
     print("=== Agent Loop Starting ===")
