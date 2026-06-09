@@ -1,24 +1,30 @@
 # Zionet Task 1 — LLM Tool-Calling Agent Loop
 
-A Python project demonstrating an agentic tool-calling loop using [OpenRouter](https://openrouter.ai) (OpenAI-compatible API). The agent can call multiple tools across multiple turns and returns a final structured JSON response validated by Pydantic.
+Two implementations of an agentic tool-calling loop using [OpenRouter](https://openrouter.ai):
+- **Task 1** — manual loop with the raw OpenAI-compatible SDK
+- **Task 2 (Bonus)** — same agent re-implemented with [LangGraph](https://langchain-ai.github.io/langgraph/)
+
+Both use the same 3 mock tools and return the same structured JSON response validated by Pydantic.
 
 ## Features
 
 - **Agentic loop** — runs until the model has no more tool calls to make
 - **3 mock tools** — `get_weather`, `calculator`, `get_current_time`
 - **Structured output** — final response is parsed into a Pydantic schema
-- **Per-iteration logging** — every round-trip with the LLM is logged to stdout
+- **Per-iteration logging** — every step is logged to stdout
 
 ## Project Structure
 
 ```
 Zionet_task1/
-├── main.py          # Entry point
-├── agent.py         # Agentic loop logic
-├── tools.py         # Tool definitions and mock implementations
-├── schema.py        # Pydantic response schema
-├── requirements.txt # Dependencies
-└── secrets.md       # API key (local only, git-ignored)
+├── main.py               # Task 1 entry point (manual loop)
+├── agent.py              # Task 1 — manual agentic loop
+├── main_langgraph.py     # Task 2 entry point (LangGraph)
+├── agent_langgraph.py    # Task 2 — LangGraph re-implementation
+├── tools.py              # Tool definitions and mock implementations (shared)
+├── schema.py             # Pydantic response schema (shared)
+├── requirements.txt      # Dependencies
+└── secrets.md            # API key (local only, git-ignored)
 ```
 
 ## Setup
@@ -33,12 +39,17 @@ Zionet_task1/
    openrouter_key = sk-or-...
    ```
 
-3. **Run**
+3. **Run Task 1** (manual loop)
    ```bash
    python main.py
    ```
 
-## Example Output
+4. **Run Task 2** (LangGraph)
+   ```bash
+   python main_langgraph.py
+   ```
+
+## Task 1 — Manual Loop Output
 
 ```
 === Agent Loop Starting ===
@@ -59,11 +70,50 @@ finish_reason: stop
 
 === Final Structured Response ===
 {
-  "answer": "The weather in Beer-Sheva today is clear skies with a temperature of 20°C, humidity at 50%, and a wind speed of 10 km/h from the north. The result of 18 * 18 is 324.",
+  "answer": "The weather in Beer-Sheva today is clear skies at 20°C. The result of 18 * 18 is 324.",
   "tools_used": ["functions.get_weather", "functions.calculator"],
-  "reasoning": "I used the 'get_weather' tool to gather the current weather in Beer-Sheva and the 'calculator' tool to compute the product of 18 and 18."
+  "reasoning": "Used get_weather and calculator tools to answer both questions."
 }
 ```
+
+## Task 2 — LangGraph Output
+
+```
+=== LangGraph Agent Loop Starting ===
+User prompt: What is the weather today in Beer-Sheva? Also, what is the result of 18*18?
+
+--- Iteration 1 [agent] ---
+  ai: [tool call]
+    -> get_weather({"city": "Beer-Sheva"})
+    -> calculator({"expr": "18*18"})
+
+--- Iteration 2 [tools] ---
+  tool: Clear skies, 20°C, humidity 50%, wind 10 km/h N
+
+--- Iteration 3 [tools] ---
+  tool: 324
+
+--- Iteration 4 [agent] ---
+  ai: { "answer": "...", "tools_used": [...], "reasoning": "..." }
+
+=== Final Structured Response ===
+{
+  "answer": "The weather in Beer-Sheva today is clear skies at 20°C. The result of 18 * 18 is 324.",
+  "tools_used": ["functions.get_weather", "functions.calculator"],
+  "reasoning": "Used get_weather and calculator tools to answer both questions."
+}
+
+--- What LangGraph hid ---
+The while loop, finish_reason routing, and messages state accumulation.
+```
+
+## What LangGraph Hides
+
+| | Task 1 (manual) | Task 2 (LangGraph) |
+|---|---|---|
+| Loop | `while True` | Graph edges |
+| Routing | `if finish_reason == "tool_calls"` | `tools_condition` |
+| State | Manual `messages.append()` | `MessagesState` |
 
 ## Response Schema
 
